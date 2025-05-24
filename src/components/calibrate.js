@@ -273,12 +273,15 @@ export default function Calibrate({calibrationComplete, setCalibrationComplete, 
                     calibrationFadingOut ? 'opacity-0 translate-y-4' : 
                     calibrationFadingIn ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                 }`}>
-                    <div className="bg-gray-800 px-4 py-2 rounded-lg flex flex-col items-center">
+                    <div className="px-4 py-2 rounded-lg flex flex-col items-center ">
                         <div className="text-white text-sm text-center font-red-hat">
                             Point {currentPointIndex + 1} of {calibrationSequence.length} | Press {pressCount}/5
                         </div>
                         <div className={'text-white text-sm center font-red-hat'}>
                             Press R to restart
+                        </div>
+                        <div className={'text-white text-sm center font-red-hat'}>
+                            Look at the point. Press spacebar to calibrate
                         </div>
                     </div>
                 </div>
