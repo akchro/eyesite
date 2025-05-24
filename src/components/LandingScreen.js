@@ -10,10 +10,10 @@ export default function LandingScreen({ children }) {
     const { isReady } = useWebGazer();
 
     useEffect(() => {
-        // Set timer for 4 seconds
+
         const timer = setTimeout(() => {
             setMinWaitingTime(true);
-        }, 4000);
+        }, 2000);
 
         return () => clearTimeout(timer);
     }, []);
@@ -34,7 +34,7 @@ export default function LandingScreen({ children }) {
                 leaveTo="opacity-0"
                 className="fixed inset-0 bg-black flex items-center justify-center z-50"
             >
-                <h1 className="text-6xl font-bold text-white">
+                <h1 className="text-6xl font-red-hat text-white">
                     Eyesite
                 </h1>
             </Transition>

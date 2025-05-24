@@ -7,6 +7,7 @@ import Square from './square';
 import WrappedSquare from './WrappedSquare';
 import ClickableSquare from './ClickableSquare';
 import WrappedClickableSquare from './WrappedClickableSquare';
+import LookAndClick from "@/components/seeableTexts/lookAndClick";
 
 const Gaze = () => {
     const [calibrationComplete, setCalibrationComplete] = useState(false);
@@ -105,37 +106,23 @@ const Gaze = () => {
                         <Square />
                     </div>
                     
-                    <div style={{ position: 'absolute', top: '20%', right: '10%' }}>
-                        <WrappedSquare />
+                    <div style={{ position: 'absolute', top: '30%', right: '20%' }}>
+                        <LookAndClick debugMode={debugMode}/>
                     </div>
                     
                     <div style={{ position: 'absolute', bottom: '20%', left: '10%' }}>
                         <ClickableSquare />
                     </div>
                     
-                    <div style={{ position: 'absolute', bottom: '20%', right: '10%' }}>
-                        <WrappedClickableSquare />
+                    <div style={{ position: 'absolute', bottom: '30%', right: '30%' }}>
+
                     </div>
                     
                     {/* Instructions */}
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white p-4 rounded shadow max-w-lg">
-                        <h3 className="font-bold mb-2 text-center text-gray-700">Gaze Interaction Demo</h3>
-                        <div className="grid grid-cols-2 gap-4 text-xs text-gray-700">
-                            <div>
-                                <strong>Top Left:</strong> Hover only (useGazeHover)
-                            </div>
-                            <div>
-                                <strong>Top Right:</strong> Hover only (GazeWrapper)
-                            </div>
-                            <div>
-                                <strong>Bottom Left:</strong> Gaze + SPACEBAR click (useGazeClick)
-                            </div>
-                            <div>
-                                <strong>Bottom Right:</strong> Gaze + SPACEBAR click (GazeClickWrapper)
-                            </div>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2 text-center">
-                            Look at squares to highlight them. Press SPACEBAR while looking at bottom squares to click!
+                    <div className="absolute bottom-20 right-10 p-4 rounded shadow max-w-lg flex flex-col">
+                        <h3 className="font-bold font-red-hat mb-2 text-center text-white">Gaze Interaction Demo</h3>
+                        <p className="text-xs text-gray-200 mt-2 text-center">
+                            Use your eyes to control, press Spacebar to click.
                         </p>
                         <p className="text-xs text-blue-600 mt-1 text-center font-medium">
                             Press 'D' key to toggle debug mode and show/hide camera

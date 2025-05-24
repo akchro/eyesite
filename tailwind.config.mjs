@@ -19,8 +19,11 @@ export default {
       },
       animation: {
         'grow-once': 'grow 5s ease-in forwards',
+      },
+      fontFamily: {
+        'red-hat': ['var(--font-red-hat)'],
+        'cor-gar': ['var(--font-cormorant-garamond)']
       }
-
     },
   },
   plugins: [],

@@ -20,7 +20,7 @@ const Square = () => {
                 transform: 'translate(-50%, -50%)',
             }}
         >
-            <div className="text-white text-center mt-10">
+            <div className="text-white text-center mt-10 font-red-hat">
                 {isGazeHovered ? 'Looking!' : 'Look at me'}
             </div>
         </div>

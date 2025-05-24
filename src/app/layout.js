@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Red_Hat_Text, Cormorant_Garamond } from "next/font/google";
 import {WebgazerProvider} from "@/components/webgazerProvider";
 import LandingScreen from "@/components/LandingScreen";
 import "./globals.css";
@@ -13,6 +13,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const redHatSans = Red_Hat_Text({
+    variable: "--font-red-hat",
+    subsets: ["latin"]
+})
+
+const cormorantGaramond = Cormorant_Garamond({
+    variable: "--font-cormorant-garamond",
+    weight: ["300", "400", "500", "600", "700"],
+    subsets: ["latin"],
+});
+
 export const metadata = {
   title: "Eyesite",
   description: "Eye tracking cursor experimental",
@@ -22,7 +33,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${redHatSans.variable} ${geistMono.variable} ${cormorantGaramond.variable} max-h-screen max-w-screen overflow-hidden antialiased`}
       >
           <WebgazerProvider>
               <LandingScreen>
