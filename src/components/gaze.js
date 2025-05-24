@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useWebGazer } from './webgazerProvider';
+import {useCallback, useEffect, useState} from 'react';
+import {useWebGazer} from './webgazerProvider';
 import Calibrate from "@/components/calibrate";
 import Square from './square';
 import WrappedSquare from './WrappedSquare';
@@ -12,7 +12,7 @@ const Gaze = () => {
     const [calibrationComplete, setCalibrationComplete] = useState(false);
     const [calibrationPoints, setCalibrationPoints] = useState({});
     const [debugMode, setDebugMode] = useState(false);
-    const { currentGaze, isReady, setVideoVisible } = useWebGazer();
+    const { currentGaze, isReady, setVideoVisible, setPredictionPointsVisible } = useWebGazer();
 
     // Handle debug mode toggle
     const handleKeyPress = useCallback((event) => {
@@ -32,10 +32,12 @@ const Gaze = () => {
     // Control video visibility based on calibration and debug mode
     useEffect(() => {
         if (setVideoVisible) {
-            const shouldShowVideo = calibrationComplete && debugMode;
-            setVideoVisible(shouldShowVideo);
+            setVideoVisible(debugMode);
         }
-    }, [calibrationComplete, debugMode, setVideoVisible]);
+        if (setPredictionPointsVisible) {
+            setPredictionPointsVisible(debugMode)
+        }
+    }, [calibrationComplete, debugMode, setVideoVisible, setPredictionPointsVisible]);
 
     const handleRecalibrate = () => {
         if (window.webgazer) {
@@ -97,7 +99,7 @@ const Gaze = () => {
             )}
 
             {calibrationComplete ? (
-                <div className="w-full h-screen relative bg-gray-100">
+                <div className="w-full h-screen relative bg-gray-950">
                     {/* Show the different types of interactive squares */}
                     <div style={{ position: 'absolute', top: '20%', left: '10%' }}>
                         <Square />
@@ -117,8 +119,8 @@ const Gaze = () => {
                     
                     {/* Instructions */}
                     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white p-4 rounded shadow max-w-lg">
-                        <h3 className="font-bold mb-2 text-center">Gaze Interaction Demo</h3>
-                        <div className="grid grid-cols-2 gap-4 text-xs">
+                        <h3 className="font-bold mb-2 text-center text-gray-700">Gaze Interaction Demo</h3>
+                        <div className="grid grid-cols-2 gap-4 text-xs text-gray-700">
                             <div>
                                 <strong>Top Left:</strong> Hover only (useGazeHover)
                             </div>

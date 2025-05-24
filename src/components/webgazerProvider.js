@@ -38,7 +38,7 @@ export function WebgazerProvider({ children }) {
                 
                 // Set WebGazer options
                 instance.showVideo(false); // Hide video initially
-                instance.showPredictionPoints(true); // Show prediction points
+                instance.showPredictionPoints(false); // Hide prediction points
                 instance.showFaceOverlay(false) // Hide face overlay initially
                 instance.showFaceFeedbackBox(false) // Hide boundary box initially
                 

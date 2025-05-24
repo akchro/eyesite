@@ -1,38 +1,45 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Transition } from '@headlessui/react';
 import { useWebGazer } from './webgazerProvider';
 
 export default function LandingScreen({ children }) {
-    const [showContent, setShowContent] = useState(false);
-    const [twoSecondsElapsed, setTwoSecondsElapsed] = useState(false);
+    const [showLanding, setShowLanding] = useState(true);
+    const [minWaitingTime, setMinWaitingTime] = useState(false);
     const { isReady } = useWebGazer();
 
     useEffect(() => {
-        // Set timer for 2 seconds
+        // Set timer for 4 seconds
         const timer = setTimeout(() => {
-            setTwoSecondsElapsed(true);
-        }, 2000);
+            setMinWaitingTime(true);
+        }, 4000);
 
         return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {
-        // Show content only when both conditions are met
-        if (twoSecondsElapsed && isReady) {
-            setShowContent(true);
+        // Hide landing screen when both conditions are met
+        if (minWaitingTime && isReady) {
+            setShowLanding(false);
         }
-    }, [twoSecondsElapsed, isReady]);
+    }, [minWaitingTime, isReady]);
 
-    if (!showContent) {
-        return (
-            <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
-                <h1 className="text-6xl font-bold text-gray-800 animate-pulse">
+    return (
+        <>
+            <Transition
+                show={showLanding}
+                leave="transition-opacity duration-500"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+                className="fixed inset-0 bg-black flex items-center justify-center z-50"
+            >
+                <h1 className="text-6xl font-bold text-white">
                     Eyesite
                 </h1>
-            </div>
-        );
-    }
-
-    return children;
+            </Transition>
+            
+            {!showLanding && children}
+        </>
+    );
 } 

@@ -11,6 +11,16 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      keyframes: {
+        grow: {
+          '0%': { transform: 'scale(1)' },
+          '100%': { transform: 'scale(1.2)' },
+        },
+      },
+      animation: {
+        'grow-once': 'grow 5s ease-in forwards',
+      }
+
     },
   },
   plugins: [],
