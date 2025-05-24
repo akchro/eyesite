@@ -117,7 +117,36 @@ const Gaze = () => {
                 </div>
             )}
 
-            {calibrationComplete ? (
+            {/* Calibration Screen with Transition */}
+            <Transition
+                show={!calibrationComplete}
+                enter="transition-all duration-1000 ease-out"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="transition-all duration-1000 ease-out"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+                as="div"
+            >
+                <Calibrate 
+                    calibrationComplete={calibrationComplete}
+                    setCalibrationComplete={setCalibrationComplete}
+                    calibrationPoints={calibrationPoints}
+                    setCalibrationPoints={setCalibrationPoints}
+                />
+            </Transition>
+
+            {/* Main Screen with Transition */}
+            <Transition
+                show={calibrationComplete}
+                enter="transition-all duration-1000 ease-out delay-500"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="transition-all duration-500 ease-out"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+                as="div"
+            >
                 <div className="w-full h-screen relative bg-gray-950">
                     {/* PlayAGame component - always visible */}
                     <PlayAGame 
@@ -186,14 +215,7 @@ const Gaze = () => {
                         </div>
                     </Transition>
                 </div>
-            ) : (
-                <Calibrate 
-                    calibrationComplete={calibrationComplete}
-                    setCalibrationComplete={setCalibrationComplete}
-                    calibrationPoints={calibrationPoints}
-                    setCalibrationPoints={setCalibrationPoints}
-                />
-            )}
+            </Transition>
         </>
     );
 };
