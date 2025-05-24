@@ -109,7 +109,7 @@ const Gaze = () => {
     }
 
     return (
-        <>
+        <main className={debugMode ? '' : 'cursor-none'}>
             {/* Debug camera overlay */}
             {debugMode && calibrationComplete && (
                 <div className="debug-camera-overlay">
@@ -168,7 +168,7 @@ const Gaze = () => {
                         leaveTo="opacity-0"
                     >
                         <div style={{ position: 'absolute', top: '20%', left: '18%' }}>
-                            <BlogButton />
+                            <BlogButton debugMode={debugMode} />
                         </div>
                     </Transition>
                     
@@ -216,7 +216,7 @@ const Gaze = () => {
                     </Transition>
                 </div>
             </Transition>
-        </>
+        </main>
     );
 };
 
