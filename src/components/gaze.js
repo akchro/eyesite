@@ -1,6 +1,7 @@
 'use client';
 
 import {useCallback, useEffect, useState} from 'react';
+import { Transition } from '@headlessui/react';
 import {useWebGazer} from './webgazerProvider';
 import Calibrate from "@/components/calibrate";
 import Square from './square';
@@ -8,6 +9,9 @@ import WrappedSquare from './WrappedSquare';
 import ClickableSquare from './ClickableSquare';
 import WrappedClickableSquare from './WrappedClickableSquare';
 import LookAndClick from "@/components/seeableTexts/lookAndClick";
+import PlayAGame from "@/components/seeableTexts/playAGame";
+import BlogButton from "@/components/seeableTexts/blogButton";
+import ScreenTooSmallWindow from "@/components/screenTooSmallWindow";
 
 const Gaze = () => {
     const [calibrationComplete, setCalibrationComplete] = useState(false);
@@ -15,10 +19,39 @@ const Gaze = () => {
     const [debugMode, setDebugMode] = useState(false);
     const { currentGaze, isReady, setVideoVisible, setPredictionPointsVisible } = useWebGazer();
 
-    // Handle debug mode toggle
+    // Game state management
+    const [gameActive, setGameActive] = useState(false);
+    const [gameProgress, setGameProgress] = useState(0);
+
+    // Screen size validation
+    const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
+    const [isScreenSizeValid, setIsScreenSizeValid] = useState(true);
+
+    const MIN_WIDTH = 1200;
+    const MIN_HEIGHT = 728;
+
+    // Check screen size
+    const checkScreenSize = useCallback(() => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        setScreenSize({ width, height });
+        setIsScreenSizeValid(width >= MIN_WIDTH && height >= MIN_HEIGHT);
+    }, []);
+
+    // Handle screen resize
+    useEffect(() => {
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, [checkScreenSize]);
+
+    // Handle debug mode toggle and recalibration
     const handleKeyPress = useCallback((event) => {
         if (event.code === 'KeyD') {
             setDebugMode(prev => !prev);
+        }
+        if (event.code === 'KeyR') {
+            handleRecalibrate();
         }
     }, []);
 
@@ -53,45 +86,30 @@ const Gaze = () => {
         setDebugMode(prev => !prev);
     };
 
+    // Game handlers
+    const handleGameStart = () => {
+        setGameActive(true);
+        setGameProgress(0);
+    };
+
+    const handleGameEnd = () => {
+        setGameActive(false);
+        setGameProgress(0);
+    };
+
+    const handleGameProgress = (progress) => {
+        setGameProgress(progress);
+    };
+
+    // Show screen size warning if dimensions are too small
+    if (!isScreenSizeValid) {
+        return (
+            <ScreenTooSmallWindow screenSize={screenSize} min_width={MIN_WIDTH} min_height={MIN_HEIGHT}/>
+        )
+    }
+
     return (
         <>
-            {/* Status display */}
-            <div className="fixed top-0 left-0 right-0 bg-gray-800 text-white p-2 flex justify-between z-50">
-                <div className="flex items-center gap-4">
-                    <span>
-                        {calibrationComplete ? 'Calibration Complete! Look at squares and press SPACEBAR to click!' : 'Click on each point to calibrate'}
-                    </span>
-                    {debugMode && (
-                        <span className="px-2 py-1 bg-yellow-600 rounded text-xs font-bold animate-pulse">
-                            DEBUG MODE
-                        </span>
-                    )}
-                </div>
-                <div className="flex gap-2">
-                    {isReady && (
-                        <div className="px-2 py-1 bg-blue-600 rounded text-sm">
-                            Gaze: ({Math.round(currentGaze.x)}, {Math.round(currentGaze.y)})
-                        </div>
-                    )}
-                    {calibrationComplete && (
-                        <button
-                            onClick={toggleDebugMode}
-                            className={`px-2 py-1 rounded text-sm ${
-                                debugMode ? 'bg-yellow-600' : 'bg-gray-600'
-                            }`}
-                        >
-                            {debugMode ? 'Debug: ON' : 'Debug: OFF'}
-                        </button>
-                    )}
-                    <button
-                        onClick={handleRecalibrate}
-                        className="px-2 py-1 bg-red-500 rounded"
-                    >
-                        Recalibrate
-                    </button>
-                </div>
-            </div>
-
             {/* Debug camera overlay */}
             {debugMode && calibrationComplete && (
                 <div className="debug-camera-overlay">
@@ -101,38 +119,72 @@ const Gaze = () => {
 
             {calibrationComplete ? (
                 <div className="w-full h-screen relative bg-gray-950">
-                    {/* Show the different types of interactive squares */}
-                    <div style={{ position: 'absolute', top: '20%', left: '10%' }}>
-                        <Square />
-                    </div>
-                    
-                    <div style={{ position: 'absolute', top: '30%', right: '20%' }}>
-                        <LookAndClick debugMode={debugMode}/>
-                    </div>
-                    
-                    <div style={{ position: 'absolute', bottom: '20%', left: '10%' }}>
-                        <ClickableSquare />
-                    </div>
-                    
-                    <div style={{ position: 'absolute', bottom: '30%', right: '30%' }}>
+                    {/* PlayAGame component - always visible */}
+                    <PlayAGame 
+                        debugMode={debugMode}
+                        gameActive={gameActive}
+                        onGameStart={handleGameStart}
+                        onGameEnd={handleGameEnd}
+                        onGameProgress={handleGameProgress}
+                    />
 
-                    </div>
+                    {/* Other interactive components - hidden during game */}
+                    <Transition
+                        show={!gameActive}
+                        enter="transition-opacity duration-500"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="transition-opacity duration-500"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div style={{ position: 'absolute', top: '20%', left: '18%' }}>
+                            <BlogButton />
+                        </div>
+                    </Transition>
+                    
+                    <Transition
+                        show={!gameActive}
+                        enter="transition-opacity duration-500"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="transition-opacity duration-500"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div style={{ position: 'absolute', top: '20%', right: '20%' }}>
+                            <LookAndClick debugMode={debugMode}/>
+                        </div>
+                    </Transition>
                     
                     {/* Instructions */}
-                    <div className="absolute bottom-20 right-10 p-4 rounded shadow max-w-lg flex flex-col">
-                        <h3 className="font-bold font-red-hat mb-2 text-center text-white">Gaze Interaction Demo</h3>
-                        <p className="text-xs text-gray-200 mt-2 text-center">
-                            Use your eyes to control, press Spacebar to click.
-                        </p>
-                        <p className="text-xs text-blue-600 mt-1 text-center font-medium">
-                            Press 'D' key to toggle debug mode and show/hide camera
-                        </p>
-                        {debugMode && (
-                            <p className="text-xs text-yellow-600 mt-1 text-center font-bold">
-                                🔧 Debug Mode Active - Camera {calibrationComplete ? 'Visible' : 'Hidden'}
+                    <Transition
+                        show={!gameActive}
+                        enter="transition-opacity duration-500"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="transition-opacity duration-500"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="absolute bottom-20 right-10 p-4 rounded shadow max-w-lg flex flex-col">
+                            <h3 className="font-bold font-red-hat mb-2 text-center text-white">Gaze Interaction Demo</h3>
+                            <p className="text-s font-red-hat text-gray-200 mt-2 text-center">
+                                Use your eyes to control, press Spacebar to click.
                             </p>
-                        )}
-                    </div>
+                            <p className="text-s font-red-hat text-gray-200 mt-1 text-center font-medium">
+                                Press D to toggle debug mode
+                            </p>
+                            <p className="text-s font-red-hat text-gray-200 mt-1 text-center font-medium">
+                                Press R to recalibrate
+                            </p>
+                            {debugMode && (
+                                <p className="text-xs text-yellow-600 mt-1 text-center font-bold">
+                                    🔧 Debug Mode Active - Camera {calibrationComplete ? 'Visible' : 'Hidden'}
+                                </p>
+                            )}
+                        </div>
+                    </Transition>
                 </div>
             ) : (
                 <Calibrate 
