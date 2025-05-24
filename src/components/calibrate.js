@@ -3,7 +3,7 @@
 import { useWebGazer } from "@/components/webgazerProvider";
 import { useState, useEffect, useCallback } from 'react';
 
-export default function Calibrate({calibrationComplete, setCalibrationComplete, calibrationPoints, setCalibrationPoints}) {
+export default function Calibrate({calibrationComplete, setCalibrationComplete, calibrationPoints, setCalibrationPoints, introShown, setIntroShown}) {
     const { calibrateAt, isReady } = useWebGazer();
     
     // Calibration state
@@ -54,6 +54,15 @@ export default function Calibrate({calibrationComplete, setCalibrationComplete, 
     useEffect(() => {
         if (!isReady) return;
 
+        // If intro has already been shown, skip directly to calibration
+        if (introShown) {
+            setShowCalibration(true);
+            setTimeout(() => {
+                setCalibrationFadingIn(true);
+            }, 50);
+            return;
+        }
+
         const timeouts = [];
         
         // Step through introduction messages
@@ -73,6 +82,8 @@ export default function Calibrate({calibrationComplete, setCalibrationComplete, 
         // Show calibration after intro
         const finalTimeout = setTimeout(() => {
             setShowCalibration(true);
+            // Mark intro as shown
+            setIntroShown(true);
             // Start fade-in animation for calibration elements
             setTimeout(() => {
                 setCalibrationFadingIn(true);
@@ -81,7 +92,7 @@ export default function Calibrate({calibrationComplete, setCalibrationComplete, 
         timeouts.push(finalTimeout);
 
         return () => timeouts.forEach(clearTimeout);
-    }, [isReady]);
+    }, [isReady, introShown, setIntroShown]);
 
     // Show encouragement after each point
     const showEncouragementMessage = () => {
@@ -109,8 +120,33 @@ export default function Calibrate({calibrationComplete, setCalibrationComplete, 
         }, 1000);
     };
 
-    // Handle spacebar press
-    const handleSpacePress = useCallback((event) => {
+    // Handle spacebar press and R for restart
+    const handleKeyPress = useCallback((event) => {
+        // Handle R key for restart calibration
+        if (event.code === 'KeyR' && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey) {
+            event.preventDefault();
+            // Reset calibration state
+            setCurrentPointIndex(0);
+            setPressCount(0);
+            setIsTransitioning(false);
+            setCalibrationPoints({});
+            setCalibrationFadingOut(false);
+            setCalibrationFadingIn(false);
+            
+            // Clear webgazer data
+            if (window.webgazer) {
+                window.webgazer.clearData();
+            }
+            
+            // Restart calibration (skip intro since it's already been shown)
+            setShowCalibration(true);
+            setTimeout(() => {
+                setCalibrationFadingIn(true);
+            }, 100);
+            return;
+        }
+
+        // Handle spacebar for calibration
         if (event.code === 'Space' && !isTransitioning && showCalibration) {
             event.preventDefault();
             
@@ -163,9 +199,9 @@ export default function Calibrate({calibrationComplete, setCalibrationComplete, 
 
     // Set up spacebar listener
     useEffect(() => {
-        window.addEventListener('keydown', handleSpacePress);
-        return () => window.removeEventListener('keydown', handleSpacePress);
-    }, [handleSpacePress]);
+        window.addEventListener('keydown', handleKeyPress);
+        return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [handleKeyPress]);
 
     if (!isReady) return <p className="text-center mt-10 text-xl">Loading eye tracker...</p>;
 
@@ -237,9 +273,12 @@ export default function Calibrate({calibrationComplete, setCalibrationComplete, 
                     calibrationFadingOut ? 'opacity-0 translate-y-4' : 
                     calibrationFadingIn ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                 }`}>
-                    <div className="bg-gray-800 px-4 py-2 rounded-lg">
-                        <div className="text-white text-sm">
+                    <div className="bg-gray-800 px-4 py-2 rounded-lg flex flex-col items-center">
+                        <div className="text-white text-sm text-center font-red-hat">
                             Point {currentPointIndex + 1} of {calibrationSequence.length} | Press {pressCount}/5
+                        </div>
+                        <div className={'text-white text-sm center font-red-hat'}>
+                            Press R to restart
                         </div>
                     </div>
                 </div>

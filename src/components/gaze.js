@@ -17,6 +17,7 @@ const Gaze = () => {
     const [calibrationComplete, setCalibrationComplete] = useState(false);
     const [calibrationPoints, setCalibrationPoints] = useState({});
     const [debugMode, setDebugMode] = useState(false);
+    const [introShown, setIntroShown] = useState(false);
     const { currentGaze, isReady, setVideoVisible, setPredictionPointsVisible } = useWebGazer();
 
     // Game state management
@@ -50,10 +51,12 @@ const Gaze = () => {
         if (event.code === 'KeyD') {
             setDebugMode(prev => !prev);
         }
-        if (event.code === 'KeyR') {
+        // Only handle R for recalibration when calibration is complete
+        // During calibration, the Calibrate component handles R key
+        if (event.code === 'KeyR' && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey && calibrationComplete) {
             handleRecalibrate();
         }
-    }, []);
+    }, [calibrationComplete]);
 
     // Set up keyboard listener for debug mode
     useEffect(() => {
@@ -78,6 +81,7 @@ const Gaze = () => {
             window.webgazer.clearData();
             setCalibrationPoints({});
             setCalibrationComplete(false);
+            // Keep introShown as true so intro doesn't replay
             // Video visibility will be handled by the useEffect above
         }
     };
@@ -133,6 +137,8 @@ const Gaze = () => {
                     setCalibrationComplete={setCalibrationComplete}
                     calibrationPoints={calibrationPoints}
                     setCalibrationPoints={setCalibrationPoints}
+                    introShown={introShown}
+                    setIntroShown={setIntroShown}
                 />
             </Transition>
 
