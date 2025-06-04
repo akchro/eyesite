@@ -137,7 +137,19 @@ const Blog = ({ debugMode, onExit }) => {
             >
                 <div className="text-white space-y-8">
                     <h1 className="text-6xl font-cor-gar text-center mb-12">Blog</h1>
-                    
+                    <blockquote className="border-l-4 border-blue-400 pl-6 py-4 mb-12 bg-gray-800/30 rounded-r-lg">
+                        <p className="text-lg font-red-hat leading-relaxed text-gray-300 italic">
+                            This is just a showcase of gaze reading. To read the blog in a more convenient way, check out{' '}
+                            <a
+                                href="https://blog.andykhau.com/blog/eyesite"
+                                className="text-blue-400 hover:text-blue-300 underline not-italic font-medium"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                blog.andykhau.com/blog/eyesite
+                            </a>
+                        </p>
+                    </blockquote>
                     {/* Real Blog Content */}
                     <article className="space-y-6">
                         <p className="text-lg font-red-hat leading-relaxed">
@@ -291,8 +303,11 @@ const Blog = ({ debugMode, onExit }) => {
 
             {/* Exit Instructions */}
             <div className="absolute top-6 right-6">
-                <p className="text-white text-sm font-red-hat bg-black/50 px-4 py-2 rounded">
+                <p className="text-white text-sm text-center font-red-hat px-4 py-2 rounded">
                     Press Spacebar to Exit
+                </p>
+                <p className="text-white text-sm text-center font-red-hat px-4 py-2 rounded">
+                    Find the original blog at blog.andykhau.com
                 </p>
             </div>
 
