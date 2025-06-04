@@ -4,13 +4,10 @@ import {useCallback, useEffect, useState} from 'react';
 import { Transition } from '@headlessui/react';
 import {useWebGazer} from './webgazerProvider';
 import Calibrate from "@/components/calibrate";
-import Square from './square';
-import WrappedSquare from './WrappedSquare';
-import ClickableSquare from './ClickableSquare';
-import WrappedClickableSquare from './WrappedClickableSquare';
 import LookAndClick from "@/components/seeableTexts/lookAndClick";
 import PlayAGame from "@/components/seeableTexts/playAGame";
 import BlogButton from "@/components/seeableTexts/blogButton";
+import Blog from "@/components/Blog";
 import ScreenTooSmallWindow from "@/components/screenTooSmallWindow";
 
 const Gaze = () => {
@@ -23,6 +20,9 @@ const Gaze = () => {
     // Game state management
     const [gameActive, setGameActive] = useState(false);
     const [gameProgress, setGameProgress] = useState(0);
+
+    // Blog state management
+    const [isReadingBlog, setIsReadingBlog] = useState(false);
 
     // Screen size validation
     const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
@@ -51,12 +51,13 @@ const Gaze = () => {
         if (event.code === 'KeyD') {
             setDebugMode(prev => !prev);
         }
-        // Only handle R for recalibration when calibration is complete
+        // Only handle R for recalibration when calibration is complete and not reading blog
         // During calibration, the Calibrate component handles R key
-        if (event.code === 'KeyR' && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey && calibrationComplete) {
+        // During blog reading, spacebar is handled by Blog component for exit
+        if (event.code === 'KeyR' && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey && calibrationComplete && !isReadingBlog) {
             handleRecalibrate();
         }
-    }, [calibrationComplete]);
+    }, [calibrationComplete, isReadingBlog]);
 
     // Set up keyboard listener for debug mode
     useEffect(() => {
@@ -105,6 +106,15 @@ const Gaze = () => {
         setGameProgress(progress);
     };
 
+    // Blog handlers
+    const handleBlogOpen = () => {
+        setIsReadingBlog(true);
+    };
+
+    const handleBlogClose = () => {
+        setIsReadingBlog(false);
+    };
+
     // Show screen size warning if dimensions are too small
     if (!isScreenSizeValid) {
         return (
@@ -142,9 +152,26 @@ const Gaze = () => {
                 />
             </Transition>
 
+            {/* Blog Screen with Transition */}
+            <Transition
+                show={calibrationComplete && isReadingBlog}
+                enter="transition-all duration-500 ease-out"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="transition-all duration-500 ease-out"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+                as="div"
+            >
+                <Blog
+                    debugMode={debugMode}
+                    onExit={handleBlogClose}
+                />
+            </Transition>
+
             {/* Main Screen with Transition */}
             <Transition
-                show={calibrationComplete}
+                show={calibrationComplete && !isReadingBlog}
                 enter="transition-all duration-1000 ease-out delay-500"
                 enterFrom="opacity-0 scale-95"
                 enterTo="opacity-100 scale-100"
@@ -174,7 +201,10 @@ const Gaze = () => {
                         leaveTo="opacity-0"
                     >
                         <div style={{ position: 'absolute', top: '20%', left: '18%' }}>
-                            <BlogButton debugMode={debugMode} />
+                            <BlogButton 
+                                debugMode={debugMode} 
+                                onBlogClick={handleBlogOpen}
+                            />
                         </div>
                     </Transition>
                     

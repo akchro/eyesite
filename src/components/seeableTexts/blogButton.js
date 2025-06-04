@@ -3,17 +3,21 @@
 import { useRef, useState } from 'react';
 import { useGazeClick } from '../useGazeClick';
 
-const BlogButton = ({debugMode}) => {
+const BlogButton = ({ debugMode, onBlogClick }) => {
     const seeableTextRef = useRef(null);
     const [isActive, setIsActive] = useState(false);
 
     const handleGazeClick = ({ gazeX, gazeY }) => {
-
         // Flash effect
         setIsActive(true);
         setTimeout(() => {
             setIsActive(false);
         }, 1000);
+
+        // Call the blog click handler if provided
+        if (onBlogClick) {
+            onBlogClick();
+        }
     };
 
     const { isGazeHovered, isClicked } = useGazeClick(seeableTextRef, handleGazeClick);
@@ -44,7 +48,7 @@ const BlogButton = ({debugMode}) => {
                     className="text-8xl font-cor-gar transition-all duration-300"
                     style={getTextGlow()}
                 >
-                    {isActive ? 'TBA' : 'Blog'}
+                    {isActive ? 'Opening...' : 'Blog'}
                 </div>
             </div>
         </div>
